@@ -5,7 +5,12 @@ public class Log extends Unary{
         super(expression);
     }
 
-        public SymbolicExpression eval(Environment vars) {
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
+
+    public SymbolicExpression eval(Environment vars) {
         SymbolicExpression arg = this.argument.eval(vars);
         if (arg.isConstant()) {
             return new Constant(Math.log(arg.getValue()));
@@ -14,6 +19,7 @@ public class Log extends Unary{
         }
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Log) {
             return this.equals((Log) other);
@@ -26,6 +32,7 @@ public class Log extends Unary{
         return this.getName().equals(other.getName()) && this.argument.equals(other.argument);
     }
 
+    @Override
     public String getName() {
         return "log";
     }

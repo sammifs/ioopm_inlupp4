@@ -9,6 +9,15 @@ public abstract class Binary extends SymbolicExpression {
         this.rhs = rhs;
     }
 
+    public SymbolicExpression lhs() {
+        return this.lhs;
+    }
+
+    public SymbolicExpression rhs() {
+        return this.rhs;
+    }
+
+    @Override
     public String toString() {
         String lhs_string;
         if (this.lhs.getPriority() < this.getPriority()) {

@@ -5,6 +5,11 @@ public class Division extends Binary {
         super(lhs, rhs);
     }
 
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
+
     public SymbolicExpression eval(Environment vars) {
         SymbolicExpression e_lhs = this.lhs.eval(vars);
         SymbolicExpression e_rhs = this.rhs.eval(vars);
@@ -16,6 +21,7 @@ public class Division extends Binary {
         }
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Division) {
             return this.equals((Division) other);
@@ -28,10 +34,12 @@ public class Division extends Binary {
         return this.lhs.equals(other.lhs) && this.rhs.equals(other.rhs);
     }
 
+    @Override
     public String getName() {
         return "/";
     }
 
+    @Override
     public int getPriority() {
         return 1;
     }

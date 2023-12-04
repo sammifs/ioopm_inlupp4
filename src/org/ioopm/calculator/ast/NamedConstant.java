@@ -9,10 +9,16 @@ public class NamedConstant extends SymbolicExpression{
         this.db = db;
     }
 
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return null; // TODO: THROW ERROR
+    }
+
     public SymbolicExpression eval(Environment vars) {
         return new Constant(this.db);
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof NamedConstant) {
             return this.equals((NamedConstant) other);
@@ -25,10 +31,12 @@ public class NamedConstant extends SymbolicExpression{
         return this.name.equals(other.name) && this.db == other.db;
     }
 
+    @Override
     public boolean isNamedConstant() {
         return true;
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

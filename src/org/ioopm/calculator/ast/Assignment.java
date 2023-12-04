@@ -5,6 +5,11 @@ public class Assignment extends Binary {
         super(lhs, rhs);
     }
 
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
+
     public SymbolicExpression eval(Environment vars) {
         SymbolicExpression e_lhs = this.lhs.eval(vars);
 
@@ -18,6 +23,7 @@ public class Assignment extends Binary {
         return e_lhs;
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Assignment) {
             return this.equals((Assignment) other);
@@ -30,6 +36,7 @@ public class Assignment extends Binary {
         return this.lhs.equals(other.lhs) && this.rhs.equals(other.rhs);
     }
 
+    @Override
     public String toString() {
         return this.lhs + " = " + this.rhs;
     }

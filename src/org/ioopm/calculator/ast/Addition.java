@@ -5,6 +5,11 @@ public class Addition extends Binary {
         super(lhs, rhs);
     }
 
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
+
     public SymbolicExpression eval(Environment vars) {
         SymbolicExpression e_lhs = this.lhs.eval(vars);
         SymbolicExpression e_rhs = this.rhs.eval(vars);
@@ -16,6 +21,7 @@ public class Addition extends Binary {
         }
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Addition) {
             return this.equals((Addition) other);
@@ -28,10 +34,12 @@ public class Addition extends Binary {
         return this.lhs.equals(other.lhs) && this.rhs.equals(other.rhs);
     }
 
+    @Override
     public String getName() {
         return "+";
     }
 
+    @Override
     public int getPriority() {
         return 0;
     }

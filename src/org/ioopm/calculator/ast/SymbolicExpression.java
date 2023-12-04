@@ -4,6 +4,8 @@ public abstract class SymbolicExpression {
 
     public abstract SymbolicExpression eval(Environment vars);
 
+    public abstract SymbolicExpression accept(Visitor v);
+
     public boolean isConstant() {
         return false;
     }

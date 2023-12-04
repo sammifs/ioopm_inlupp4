@@ -5,6 +5,11 @@ public class Sin extends Unary {
         super(expression);
     }
 
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
+
     public SymbolicExpression eval(Environment vars) {
         SymbolicExpression arg = this.argument.eval(vars);
         if (arg.isConstant()) {
@@ -14,6 +19,7 @@ public class Sin extends Unary {
         }
     }
 
+    @Override
     public boolean equals(Object other) {
         if (other instanceof Sin) {
             return this.equals((Sin) other);
@@ -26,6 +32,7 @@ public class Sin extends Unary {
         return this.getName().equals(other.getName()) && this.argument.equals(other.argument);
     }
 
+    @Override
     public String getName() {
         return "sin";
     }
