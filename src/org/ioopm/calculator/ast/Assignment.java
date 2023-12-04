@@ -11,6 +11,9 @@ public class Assignment extends Binary {
         if (rhs.isNamedConstant()) {
             throw new IllegalAssignmentException("Error: cannot redefine named constant");
         }
+        if (!(rhs instanceof Variable)) {
+            throw new IllegalAssignmentException("Error: assignment needs variable");
+        }
         vars.put((Variable)rhs, e_lhs);
         return e_lhs;
     }

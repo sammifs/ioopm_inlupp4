@@ -31,6 +31,10 @@ public class Variable extends Atom {
         return this.identifier;
     }
 
+    public String getName() {
+        return this.identifier;
+    }
+
     @Override
     public int hashCode() {
         return this.identifier.hashCode();
