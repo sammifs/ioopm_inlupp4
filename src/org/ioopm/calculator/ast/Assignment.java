@@ -10,19 +10,6 @@ public class Assignment extends Binary {
         return v.visit(this);
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        SymbolicExpression e_lhs = this.lhs.eval(vars);
-
-        if (rhs.isNamedConstant()) {
-            throw new IllegalAssignmentException("Error: cannot redefine named constant");
-        }
-        if (!(rhs instanceof Variable)) {
-            throw new IllegalAssignmentException("Error: assignment needs variable");
-        }
-        vars.put((Variable)rhs, e_lhs);
-        return e_lhs;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Assignment) {

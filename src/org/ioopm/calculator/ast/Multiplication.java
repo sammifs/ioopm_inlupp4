@@ -10,17 +10,6 @@ public class Multiplication extends Binary {
         return v.visit(this);
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        SymbolicExpression e_lhs = this.lhs.eval(vars);
-        SymbolicExpression e_rhs = this.rhs.eval(vars);
-
-        if (e_lhs.isConstant() && e_rhs.isConstant()) {
-            return new Constant(e_lhs.getValue() * e_rhs.getValue());
-        } else {
-            return new Multiplication(e_lhs, e_rhs);
-        }
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Multiplication) {

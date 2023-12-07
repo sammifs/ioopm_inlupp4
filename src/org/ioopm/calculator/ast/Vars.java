@@ -6,5 +6,9 @@ public class Vars extends Command {
     public static Vars instance() {
         return theInstance;
     }
-    
+
+    @Override
+    public SymbolicExpression accept(Visitor v) {
+        return v.visit(this);
+    }
 }

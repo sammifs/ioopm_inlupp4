@@ -10,15 +10,6 @@ public class Negation extends Unary {
         return v.visit(this);
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        SymbolicExpression arg = this.argument.eval(vars);
-        if (arg.isConstant()) {
-            return new Constant(-arg.getValue());
-        } else {
-            return new Negation(arg);
-        }
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Negation) {

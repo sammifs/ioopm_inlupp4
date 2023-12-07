@@ -64,7 +64,7 @@ public class ASTUnitTests {
 
     @Test
     void CommandTests() {
-        Command c = new Command();
+        Quit c = Quit.instance();
         assertFalse(c.isConstant());
         assertTrue(c.isCommand());
         assertTrue(c.getPriority() == 100);

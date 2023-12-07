@@ -10,15 +10,6 @@ public class Log extends Unary{
         return v.visit(this);
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        SymbolicExpression arg = this.argument.eval(vars);
-        if (arg.isConstant()) {
-            return new Constant(Math.log(arg.getValue()));
-        } else {
-            return new Sin(arg);
-        }
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Log) {

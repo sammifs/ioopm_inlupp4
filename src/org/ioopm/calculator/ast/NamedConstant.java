@@ -14,10 +14,6 @@ public class NamedConstant extends SymbolicExpression{
         return null; // TODO: THROW ERROR
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        return new Constant(this.db);
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof NamedConstant) {

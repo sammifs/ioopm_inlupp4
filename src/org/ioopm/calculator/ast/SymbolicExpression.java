@@ -2,8 +2,6 @@ package org.ioopm.calculator.ast; /// could place this in parser *for now*
 
 public abstract class SymbolicExpression {
 
-    public abstract SymbolicExpression eval(Environment vars);
-
     public abstract SymbolicExpression accept(Visitor v);
 
     public boolean isConstant() {

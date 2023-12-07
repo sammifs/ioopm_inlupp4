@@ -2,10 +2,32 @@ package org.ioopm.calculator.ast;
 
 public class EvaluationVisitor implements Visitor {
     private Environment env = null;
+    public SymbolicExpression error;
 
     public SymbolicExpression evaluate(SymbolicExpression topLevel, Environment env) {
         this.env = env;
         return topLevel.accept(this);
+    }
+
+    public boolean check(SymbolicExpression s) {
+        NamedConstantChecker checker = new NamedConstantChecker();
+        try {
+            s.accept(checker);
+            return true;
+        } catch (IllegalAssignmentException e){
+            error = checker.error;
+            return false;
+        }
+    }
+
+    public boolean reassign_check(SymbolicExpression s) {
+        ReassignmentChecker r = new ReassignmentChecker();
+        try {
+            s.accept(r);
+            return true;
+        } catch (IllegalAssignmentException e) {
+            return false;
+        }
     }
 
     public SymbolicExpression visit(Addition n) {
@@ -57,7 +79,11 @@ public class EvaluationVisitor implements Visitor {
     }
 
     public SymbolicExpression visit(Variable n) {
-        return n;
+        if (this.env.get(n) != null) {
+            return env.get(n);
+        } else {
+            return n;
+        }
     }
 
     public SymbolicExpression visit(Negation n) {
@@ -108,5 +134,30 @@ public class EvaluationVisitor implements Visitor {
         } else {
             return new Log(arg);
         }
+    }
+
+    public SymbolicExpression visit(Assignment n) {
+        SymbolicExpression e_lhs = n.lhs.accept(this);
+
+        if (n.rhs.isNamedConstant()) {
+            throw new IllegalAssignmentException("Error: cannot redefine named constant");
+        }
+        if (!(n.rhs instanceof Variable)) {
+            throw new IllegalAssignmentException("Error: assignment needs variable");
+        }
+        this.env.put((Variable)n.rhs, e_lhs);
+        return e_lhs;
+    }
+
+    public SymbolicExpression visit(Clear n) {
+        return n;
+    }
+
+    public SymbolicExpression visit(Quit n) {
+        return n;
+    }
+
+    public SymbolicExpression visit(Vars n) {
+        return n;
     }
 }

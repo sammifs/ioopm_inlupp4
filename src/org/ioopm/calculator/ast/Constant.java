@@ -12,10 +12,6 @@ public class Constant extends Atom {
         return v.visit(this);
     }
 
-    public SymbolicExpression eval(Environment vars) {
-        return this;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof Constant) {

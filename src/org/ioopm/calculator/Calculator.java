@@ -11,6 +11,7 @@ public class Calculator {
     public static void main(String[] args) throws IOException {
         final CalculatorParser cp = new CalculatorParser();
         final Environment vars = new Environment();
+        final EvaluationVisitor evaluator = new EvaluationVisitor();
 
         int expressions = 0;
         int success = 0;
@@ -22,6 +23,7 @@ public class Calculator {
                 SymbolicExpression se = cp.parse(input, vars);
                 expressions++;
                 if (se.isCommand()) {
+                    success++;
                     if (se instanceof Quit) {
                         break;
                     } else if (se instanceof Vars) {
@@ -30,15 +32,20 @@ public class Calculator {
                         vars.clear();
                     }
                 } else {
-                    try { 
-                        SymbolicExpression ans = se.eval(vars);
-                        System.out.println(ans);
-                        success++;
-                        if (ans.isConstant()) {
-                            full_evaluations++;
+                    if (evaluator.check(se)) {
+                        if (evaluator.reassign_check(se)) {
+                            SymbolicExpression ans = evaluator.evaluate(se, vars);
+                            System.out.println(ans);
+                            success++;
+                            if (ans.isConstant()) {
+                                full_evaluations++;
+                            }
+                        } else {
+                            System.out.println("Error, variable assigned more than once in expression");
                         }
-                    } catch (IllegalAssignmentException e) {
-                        System.out.println(e);
+                    } else {
+                        System.out.println("Error, assignments to named constants: ");
+                        System.out.println(evaluator.error);
                     }
                 }
             } catch (SyntaxErrorException e) {
