@@ -3,6 +3,11 @@ package org.ioopm.calculator.ast;
 public class NamedConstantChecker implements Visitor {
     public SymbolicExpression error;
 
+    public SymbolicExpression visit(Scope c) {
+        c.argument.accept(this);
+        return null;
+    }
+
     public SymbolicExpression visit(Addition a) {
         a.lhs.accept(this);
         a.rhs.accept(this);

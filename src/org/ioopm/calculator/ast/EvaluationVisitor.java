@@ -1,11 +1,11 @@
 package org.ioopm.calculator.ast;
 
 public class EvaluationVisitor implements Visitor {
-    private Environment env = null;
+    private StackEnvironment env = null;
     public SymbolicExpression error;
 
     public SymbolicExpression evaluate(SymbolicExpression topLevel, Environment env) {
-        this.env = env;
+        this.env = new StackEnvironment(env);
         return topLevel.accept(this);
     }
 
@@ -28,6 +28,15 @@ public class EvaluationVisitor implements Visitor {
         } catch (IllegalAssignmentException e) {
             return false;
         }
+    }
+
+    public SymbolicExpression visit(Scope s) {
+        this.env.pushEnvironment(new Environment());
+
+        SymbolicExpression arg = s.arg().accept(this);
+
+        this.env.popEnvironment();
+        return arg;
     }
 
     public SymbolicExpression visit(Addition n) {
@@ -139,13 +148,10 @@ public class EvaluationVisitor implements Visitor {
     public SymbolicExpression visit(Assignment n) {
         SymbolicExpression e_lhs = n.lhs.accept(this);
 
-        if (n.rhs.isNamedConstant()) {
-            throw new IllegalAssignmentException("Error: cannot redefine named constant");
-        }
         if (!(n.rhs instanceof Variable)) {
             throw new IllegalAssignmentException("Error: assignment needs variable");
         }
-        this.env.put((Variable)n.rhs, e_lhs);
+        this.env.stack_put((Variable)n.rhs, e_lhs);
         return e_lhs;
     }
 

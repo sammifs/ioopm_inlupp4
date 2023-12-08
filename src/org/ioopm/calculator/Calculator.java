@@ -20,8 +20,8 @@ public class Calculator {
         while (true) {
             String input = System.console().readLine();
             try {
-                SymbolicExpression se = cp.parse(input, vars);
                 expressions++;
+                SymbolicExpression se = cp.parse(input, vars);
                 if (se.isCommand()) {
                     success++;
                     if (se instanceof Quit) {

@@ -99,7 +99,6 @@ public class CalculatorParser {
         }
     }
 
-
     /**
      * Checks wether the token read is an assignment between 2 expression and 
      * descend into the right hand side of '='
@@ -213,7 +212,13 @@ public class CalculatorParser {
      */
     private SymbolicExpression primary() throws IOException {
         SymbolicExpression result;
-        if (this.st.ttype == '(') {
+        if (this.st.ttype == '{') {
+            this.st.nextToken();
+            result = new Scope(assignment());
+            if (this.st.nextToken() != '}') {
+                throw new SyntaxErrorException("expected '}'");
+            }
+        } else if (this.st.ttype == '(') {
             this.st.nextToken();
             result = assignment();
             /// This captures unbalanced parentheses!

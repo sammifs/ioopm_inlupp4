@@ -5,6 +5,10 @@ import java.util.ArrayList;
 public class ReassignmentChecker implements Visitor {
     private ArrayList<Variable> vars = new ArrayList<>();
 
+    public SymbolicExpression visit(Scope c) {
+        return null;
+    }
+
     public SymbolicExpression visit(Addition a) {
         a.lhs.accept(this);
         a.rhs.accept(this);
