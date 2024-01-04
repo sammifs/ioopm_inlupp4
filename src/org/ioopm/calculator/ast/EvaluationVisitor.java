@@ -30,6 +30,21 @@ public class EvaluationVisitor implements Visitor {
         }
     }
 
+    public SymbolicExpression visit(Conditional c) {
+        FreeBoundVariableChecker f = new FreeBoundVariableChecker(this.env);
+        c.boolexp().accept(f);
+        SymbolicExpression boolexp = c.boolexp().accept(this);
+        SymbolicExpression first = c.first_scope().accept(this);
+        SymbolicExpression second = c.second_scope().accept(this);
+        
+    
+        if (boolexp.getValue() == 1) {
+            return first;
+        } else {
+            return second;
+        }
+    }
+
     public SymbolicExpression visit(Scope s) {
         this.env.pushEnvironment(new Environment());
 
@@ -69,6 +84,51 @@ public class EvaluationVisitor implements Visitor {
             return new Constant(left.getValue() * right.getValue());
         } else {
             return new Multiplication(left, right);
+        }
+    }
+
+    public SymbolicExpression visit(BooleanEquals n) {
+        SymbolicExpression left = n.lhs().accept(this);
+        SymbolicExpression right = n.rhs().accept(this);
+
+        if (left.isConstant() && right.isConstant()) {
+            if (left.getValue() == right.getValue()) {
+                return new Constant(1);
+            } else {
+                return new Constant(0);
+            }
+        } else {
+            return new BooleanEquals(left, right);
+        }
+    }
+
+    public SymbolicExpression visit(BooleanLess n) {
+        SymbolicExpression left = n.lhs().accept(this);
+        SymbolicExpression right = n.rhs().accept(this);
+
+        if (left.isConstant() && right.isConstant()) {
+            if (left.getValue() < right.getValue()) {
+                return new Constant(1);
+            } else {
+                return new Constant(0);
+            }
+        } else {
+            return new BooleanEquals(left, right);
+        }
+    }
+
+    public SymbolicExpression visit(BooleanMore n) {
+        SymbolicExpression left = n.lhs().accept(this);
+        SymbolicExpression right = n.rhs().accept(this);
+
+        if (left.isConstant() && right.isConstant()) {
+            if (left.getValue() > right.getValue()) {
+                return new Constant(1);
+            } else {
+                return new Constant(0);
+            }
+        } else {
+            return new BooleanEquals(left, right);
         }
     }
 

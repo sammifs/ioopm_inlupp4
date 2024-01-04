@@ -34,11 +34,15 @@ public class Calculator {
                 } else {
                     if (evaluator.check(se)) {
                         if (evaluator.reassign_check(se)) {
-                            SymbolicExpression ans = evaluator.evaluate(se, vars);
-                            System.out.println(ans);
-                            success++;
-                            if (ans.isConstant()) {
-                                full_evaluations++;
+                            try {
+                                SymbolicExpression ans = evaluator.evaluate(se, vars);
+                                System.out.println(ans);
+                                success++;
+                                if (ans.isConstant()) {
+                                    full_evaluations++;
+                                }
+                            } catch (IllegalAssignmentException e) {
+                                System.out.println(e);
                             }
                         } else {
                             System.out.println("Error, variable assigned more than once in expression");

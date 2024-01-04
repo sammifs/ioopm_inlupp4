@@ -10,6 +10,9 @@ public interface Visitor {
     public SymbolicExpression visit(Exp n);
     public SymbolicExpression visit(Log n);
     public SymbolicExpression visit(Multiplication n);
+    public SymbolicExpression visit(BooleanEquals n);
+    public SymbolicExpression visit(BooleanLess n);
+    public SymbolicExpression visit(BooleanMore n);
     public SymbolicExpression visit(Negation n);
     public SymbolicExpression visit(Quit n);
     public SymbolicExpression visit(Sin n);
@@ -17,4 +20,5 @@ public interface Visitor {
     public SymbolicExpression visit(Variable n);
     public SymbolicExpression visit(Vars n);
     public SymbolicExpression visit(Scope n);
+    public SymbolicExpression visit(Conditional n);
 }

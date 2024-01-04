@@ -1,7 +1,11 @@
 package org.ioopm.calculator.ast;
 
-public class NamedConstantChecker implements Visitor {
-    public SymbolicExpression error;
+public class FreeBoundVariableChecker implements Visitor {
+    private StackEnvironment vars;
+
+    public FreeBoundVariableChecker(StackEnvironment vars) {
+        this.vars = vars;
+    }
 
     public SymbolicExpression visit(Conditional c) {
         c.boolexp().accept(this);
@@ -60,10 +64,6 @@ public class NamedConstantChecker implements Visitor {
     public SymbolicExpression visit(Assignment a) {
         a.lhs.accept(this);
         a.rhs.accept(this);
-        if (a.rhs.isNamedConstant()) {
-            error = a;
-            throw new IllegalAssignmentException("Error: cannot redefine named constant");
-        }
         return null;
     }
 
@@ -84,6 +84,9 @@ public class NamedConstantChecker implements Visitor {
     }
 
     public SymbolicExpression visit(Variable c) {
+        if (this.vars.get(c) == null) {
+            throw new IllegalAssignmentException("Error, free bound variable in condition");
+        }
         return null;
     }
 

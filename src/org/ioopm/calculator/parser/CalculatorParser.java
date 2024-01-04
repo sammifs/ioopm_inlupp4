@@ -25,13 +25,22 @@ public class CalculatorParser {
     private static String LOG = "Log";
     private static String EXP = "Exp";
     private static char ASSIGNMENT = '=';
+	private static char EQUALS = ':';
+	private static char LESS = '<';
+	private static char MORE = '>';
 
     // unallowerdVars is used to check if variabel name that we
     // want to assign new meaning to is a valid name eg 3 = Quit
     // or 10 + x = L is not allowed
     private final ArrayList < String > unallowedVars = new ArrayList < String > (Arrays.asList("Quit",
         "Vars",
-        "Clear"));
+        "Clear",
+        "Cos",
+        "Sin",
+        "Exp",
+        "Log",
+        "if",
+        "else"));
 
     /**
      * Used to parse the inputted string by the Calculator program
@@ -66,7 +75,9 @@ public class CalculatorParser {
         if (this.st.ttype == this.st.TT_WORD) { // vilken typ det senaste tecken vi läste in hade.
             if (this.st.sval.equals("Quit") || this.st.sval.equals("Vars") || this.st.sval.equals("Clear")) { // sval = string Variable
                 result = command();
-            } else {
+            } else if (this.st.sval.equals("if")) {
+				result = if_else();
+			} else {
                 result = assignment(); // går vidare med uttrycket.
             }
         } else {
@@ -83,6 +94,17 @@ public class CalculatorParser {
         return result;
     }
 
+	private SymbolicExpression if_else() throws IOException {
+		this.st.nextToken();
+		SymbolicExpression booleanexpression = boolexpression();
+		this.st.nextToken();
+		SymbolicExpression s1 = primary();
+		this.st.nextToken();
+		this.st.nextToken();
+		SymbolicExpression s2 = primary();
+		this.st.nextToken();
+		return new Conditional(booleanexpression, s1, s2);
+	}
 
     /**
      * Checks what kind of command that should be returned
@@ -182,22 +204,41 @@ public class CalculatorParser {
      * @throws IOException by nextToken() if it reads invalid input
      */
     private SymbolicExpression term() throws IOException {
-        SymbolicExpression result = primary();
+        SymbolicExpression result = boolexpression();
         this.st.nextToken();
         while (this.st.ttype == MULTIPLY || this.st.ttype == DIVISION) {
             int operation = st.ttype;
             this.st.nextToken();
 
             if (operation == MULTIPLY) {
-                result = new Multiplication(result, primary());
+                result = new Multiplication(result, boolexpression());
             } else {
-                result = new Division(result, primary());
+                result = new Division(result, boolexpression());
             }
             this.st.nextToken();
         }
         this.st.pushBack();
         return result;
     }
+
+	private SymbolicExpression boolexpression() throws IOException {
+		SymbolicExpression result = primary();
+		this.st.nextToken();
+		while (this.st.ttype == EQUALS || this.st.ttype == LESS || this.st.ttype == MORE) {
+			int operation = st.ttype;
+			this.st.nextToken();
+			if (operation == EQUALS) {
+				result = new BooleanEquals(result, primary());
+			} else if (operation == LESS) {
+				result = new BooleanLess(result, primary());
+			} else {
+				result = new BooleanMore(result, primary());
+			}
+			this.st.nextToken();
+		}
+		this.st.pushBack();
+		return result;
+	}
 
     /**
      * Checks wether the token read is a parantheses and then
