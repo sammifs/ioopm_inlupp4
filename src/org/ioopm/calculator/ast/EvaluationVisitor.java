@@ -1,8 +1,15 @@
 package org.ioopm.calculator.ast;
 
+import java.util.ArrayList;
+
 public class EvaluationVisitor implements Visitor {
-    private StackEnvironment env = null;
+    public StackEnvironment env = null;
     public SymbolicExpression error;
+    ArrayList<FunctionDeclaration> funcs;
+
+    public EvaluationVisitor(ArrayList<FunctionDeclaration> funs) {
+        this.funcs = funs;
+    }
 
     public SymbolicExpression evaluate(SymbolicExpression topLevel, Environment env) {
         this.env = new StackEnvironment(env);
@@ -34,15 +41,49 @@ public class EvaluationVisitor implements Visitor {
         FreeBoundVariableChecker f = new FreeBoundVariableChecker(this.env);
         c.boolexp().accept(f);
         SymbolicExpression boolexp = c.boolexp().accept(this);
-        SymbolicExpression first = c.first_scope().accept(this);
-        SymbolicExpression second = c.second_scope().accept(this);
         
-    
         if (boolexp.getValue() == 1) {
-            return first;
+            return c.first_scope().accept(this);
         } else {
-            return second;
+            return c.second_scope().accept(this);
         }
+    }
+
+    public SymbolicExpression visit(Sequence f) {
+        for (SymbolicExpression s : f.getExpsExceptLast()) {
+            s.accept(this);
+        }
+        return f.getLast().accept(this);
+    }
+
+    public SymbolicExpression visit(FunctionDeclaration f) {
+        f.getBody().accept(this);
+        return null;
+    }
+
+    public SymbolicExpression visit(End f) {
+        return f;
+    }
+
+    public SymbolicExpression visit(FunctionCall f) {
+        for (FunctionDeclaration stored_function : funcs) {
+            if (stored_function.name.equals(f.name)) {
+                if (stored_function.arg_n != f.arg_n) {
+                    System.out.println("Error, function '"+ stored_function.name + "' called with wrong number of arguments.");
+                } else {
+                    //this.env.pushEnvironment(new Environment());
+                    for (int i=0; i<stored_function.arg_n; i++) {
+                        Assignment a = new Assignment(f.getArgI(i), stored_function.getParamI(i));
+                        a.accept(this);
+                    }
+                    SymbolicExpression ans = stored_function.getBody().accept(this);
+                    //this.env.popEnvironment();
+                    return ans;
+                }
+            } 
+        }
+        System.out.println("Error, no function of that name.");
+        return f;
     }
 
     public SymbolicExpression visit(Scope s) {
@@ -113,7 +154,7 @@ public class EvaluationVisitor implements Visitor {
                 return new Constant(0);
             }
         } else {
-            return new BooleanEquals(left, right);
+            return new BooleanLess(left, right);
         }
     }
 
@@ -128,7 +169,7 @@ public class EvaluationVisitor implements Visitor {
                 return new Constant(0);
             }
         } else {
-            return new BooleanEquals(left, right);
+            return new BooleanMore(left, right);
         }
     }
 

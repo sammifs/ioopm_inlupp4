@@ -21,4 +21,8 @@ public interface Visitor {
     public SymbolicExpression visit(Vars n);
     public SymbolicExpression visit(Scope n);
     public SymbolicExpression visit(Conditional n);
+    public SymbolicExpression visit(FunctionDeclaration n);
+    public SymbolicExpression visit(Sequence n);
+    public SymbolicExpression visit(FunctionCall n);
+    public SymbolicExpression visit(End n);
 }

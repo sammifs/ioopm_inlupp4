@@ -10,6 +10,26 @@ public class NamedConstantChecker implements Visitor {
         return null;
     }
 
+    public SymbolicExpression visit(Sequence f) {
+        for (SymbolicExpression s : f.getExps()) {
+            s.accept(this);
+        }
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionDeclaration f) {
+        f.getBody().accept(this);
+        return null;
+    }
+
+    public SymbolicExpression visit(End f) {
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionCall f) {
+        return null;
+    }
+
     public SymbolicExpression visit(Scope c) {
         c.argument.accept(this);
         return null;

@@ -16,6 +16,14 @@ public abstract class SymbolicExpression {
         return false;
     }
 
+    public boolean isFunctionDeclaration() {
+        return false;
+    }
+
+    public boolean isFunctionCall() {
+        return false;
+    }
+
     public String getName(){
         throw new RuntimeException("getName() called on expression with no operator");
     }

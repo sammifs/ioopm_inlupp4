@@ -7,6 +7,22 @@ public class FreeBoundVariableChecker implements Visitor {
         this.vars = vars;
     }
 
+    public SymbolicExpression visit(Sequence c) {
+        return null;
+    }
+
+    public SymbolicExpression visit(End c) {
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionCall c) {
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionDeclaration c) {
+        return null;
+    }
+
     public SymbolicExpression visit(Conditional c) {
         c.boolexp().accept(this);
         c.first_scope().accept(this);

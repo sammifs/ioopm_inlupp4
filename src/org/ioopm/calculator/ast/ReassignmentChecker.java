@@ -5,6 +5,26 @@ import java.util.ArrayList;
 public class ReassignmentChecker implements Visitor {
     private ArrayList<Variable> vars = new ArrayList<>();
 
+    public SymbolicExpression visit(Sequence f) {
+        for (SymbolicExpression s : f.getExps()) {
+            s.accept(this);
+        }
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionDeclaration f) {
+        f.getBody().accept(this);
+        return null;
+    }
+
+    public SymbolicExpression visit(End f) {
+        return null;
+    }
+
+    public SymbolicExpression visit(FunctionCall f) {
+        return null;
+    }
+
     public SymbolicExpression visit(Conditional c) {
         return null;
     }

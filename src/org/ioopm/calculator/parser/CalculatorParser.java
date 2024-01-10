@@ -40,7 +40,9 @@ public class CalculatorParser {
         "Exp",
         "Log",
         "if",
-        "else"));
+        "else",
+        "function",
+        "end"));
 
     /**
      * Used to parse the inputted string by the Calculator program
@@ -73,11 +75,11 @@ public class CalculatorParser {
         }
 
         if (this.st.ttype == this.st.TT_WORD) { // vilken typ det senaste tecken vi läste in hade.
-            if (this.st.sval.equals("Quit") || this.st.sval.equals("Vars") || this.st.sval.equals("Clear")) { // sval = string Variable
+            if (this.st.sval.equals("function")) {
+                result = functionDeclaration();
+            } else if (this.st.sval.equals("Quit") || this.st.sval.equals("Vars") || this.st.sval.equals("Clear") || this.st.sval.equals("end")) { // sval = string Variable
                 result = command();
-            } else if (this.st.sval.equals("if")) {
-				result = if_else();
-			} else {
+            } else {
                 result = assignment(); // går vidare med uttrycket.
             }
         } else {
@@ -86,7 +88,7 @@ public class CalculatorParser {
 
         if (this.st.nextToken() != this.st.TT_EOF) { // token should be an end of stream token if we are done
             if (this.st.ttype == this.st.TT_WORD) {
-                throw new SyntaxErrorException("Error: Unexpected '" + this.st.sval + "'");
+                throw new SyntaxErrorException("Error: f'" + this.st.sval + "'");
             } else {
                 throw new SyntaxErrorException("Error: Unexpected '" + String.valueOf((char) this.st.ttype) + "'");
             }
@@ -94,7 +96,36 @@ public class CalculatorParser {
         return result;
     }
 
+    private SymbolicExpression functionDeclaration() throws IOException {
+        this.st.nextToken();
+        String identifier = ((Variable) identifier()).getName();
+        this.st.nextToken();
+        if (this.st.ttype != '(') {
+            throw new SyntaxErrorException("Error: expected '('");
+        }
+        ArrayList<Variable> parameters = new ArrayList<>();
+        this.st.nextToken();
+
+        if (this.st.ttype != ')') {
+            while (true) {
+                Variable parameter = ((Variable) identifier());
+                parameters.add(parameter);
+                this.st.nextToken();
+
+                if (this.st.ttype == ')') {
+                    break;
+                } else if (this.st.ttype != ',') {
+                    throw new SyntaxErrorException("Error: expected ',");
+                }
+
+                this.st.nextToken();
+            }
+        }
+        return new FunctionDeclaration(identifier, parameters);
+    }
+
 	private SymbolicExpression if_else() throws IOException {
+        System.out.println("HEATHENS");
 		this.st.nextToken();
 		SymbolicExpression booleanexpression = boolexpression();
 		this.st.nextToken();
@@ -106,6 +137,32 @@ public class CalculatorParser {
 		return new Conditional(booleanexpression, s1, s2);
 	}
 
+    private SymbolicExpression functionCall() throws IOException {
+        String identifier = ((Variable) identifier()).getName();
+        this.st.nextToken();
+        if (this.st.ttype != '(') {
+            throw new SyntaxErrorException("Error: functionCall expected (");
+        }
+        ArrayList<SymbolicExpression> arguments = new ArrayList<>();
+        this.st.nextToken();
+        if (this.st.ttype != ')') {
+            while (true) {
+                SymbolicExpression argument = expression();
+                arguments.add(argument);
+                this.st.nextToken();
+
+                if (this.st.ttype == ')') {
+                    break;
+                } else if (this.st.ttype != ',') {
+                    throw new SyntaxErrorException("Error: functionCall expected ','");
+                }
+
+                this.st.nextToken();
+            }
+        }
+        return new FunctionCall(identifier, arguments);
+    }
+
     /**
      * Checks what kind of command that should be returned
      * @return an instance of Quit, Clear or Vars depending on the token parsed
@@ -116,8 +173,10 @@ public class CalculatorParser {
             return Quit.instance();
         } else if (this.st.sval.equals("Clear")) {
             return Clear.instance();
-        } else {
+        } else if (this.st.sval.equals("Vars")) {
             return Vars.instance();
+        } else {
+            return End.instance();
         }
     }
 
@@ -257,7 +316,7 @@ public class CalculatorParser {
             this.st.nextToken();
             result = new Scope(assignment());
             if (this.st.nextToken() != '}') {
-                throw new SyntaxErrorException("expected '}'");
+                throw new SyntaxErrorException("expected '}' instead of " + this.st.sval);
             }
         } else if (this.st.ttype == '(') {
             this.st.nextToken();
@@ -276,8 +335,19 @@ public class CalculatorParser {
                 st.sval.equals(LOG)) {
 
                 result = unary();
+            } else if (this.st.sval.equals("if")) {
+				result = if_else();
             } else {
-                result = identifier();
+                String tmp = this.st.sval;
+                this.st.nextToken();
+                this.st.pushBack();
+                if (this.st.ttype == '(') {
+                    this.st.sval = tmp;
+                    result = functionCall();
+                } else {
+                    this.st.sval = tmp;
+                    result = identifier();
+                }
             }
         } else {
             this.st.pushBack();
